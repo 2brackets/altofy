@@ -1,0 +1,53 @@
+# --- Node / Frontend (Vite, React, Angular, etc) ---
+node_modules/
+dist/
+.vite/
+build/
+*.local
+
+# --- Logs ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.swp
+
+# --- OS specific ---
+.DS_Store
+Thumbs.db
+
+# --- Java / Spring ---
+target/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# --- Gradle / Maven ---
+.gradle/
+build/
+.settings/
+.classpath
+.project
+!gradle-wrapper.jar
+
+# --- Env files ---
+.env
+.env.local
+.env.*.local
+
+# --- Coverage / Testing ---
+coverage/
+.jest/
+nyc_output/
+
+# --- Docker ---
+*.pid
+*.seed
+*.pid.lock
