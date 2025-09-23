@@ -20,7 +20,7 @@ export default function Navbar() {
   ];
 
     return (
-        <div className="navbar bg-base-100 shadow-sm">
+        <div className="navbar bg-base-100 shadow-sm fixed top-0 left-0 w-full z-50">
             <div className="flex-1">
               <a className="btn btn-ghost text-xl"><RiSignalTowerFill/> Altofy</a>
             </div>
@@ -36,8 +36,8 @@ export default function Navbar() {
                           "h-full px-6 inline-flex items-center justify-center gap-2 font-semibold text-lg",
                           "border-b-4", 
                           isActive
-                            ? "border-primary text-primary"
-                            : "border-transparent text-base-content/80 hover:border-primary hover:text-primary",
+                            ? "border-accent text-accent"
+                            : "border-transparent text-base-content/80 hover:border-accent hover:text-accent",
                           "transition-colors"
                         ].join(" ")}
                       >
