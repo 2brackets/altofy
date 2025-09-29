@@ -3,10 +3,10 @@ import LoginPage from "./pages/LoginPage";
 import './App.css'
 
 function App() {
-
+ //const [isAuthed, setIsAuthed] = useState(false);
   return (
     <>
-      <Navbar/>
+      <Navbar isAuthed={false} initials=""/>
       <LoginPage/>
     </>
   )

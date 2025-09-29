@@ -1,69 +1,83 @@
-# React + TypeScript + Vite
+# Altofy UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend for **Altofy**, built with [Vite](https://vitejs.dev/), [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/) and [daisyUI](https://daisyui.com/).
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Getting Started
 
-## Expanding the ESLint configuration
+### Prerequisites
+- Node.js (>= 18)
+- npm (>= 9) or yarn / pnpm
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+```bash
+# install dependencies
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Run development server
+```bash
+npm run dev
 ```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Build for production
+```bash
+npm run build
+```
+
+### Preview production build
+```bash
+npm run preview
+```
+
+---
+
+## 📂 Project Structure
+```
+ui/
+ ├─ src/
+ │   ├─ api/         # API client (GET, POST, PUT, DELETE)
+ │   ├─ components/  # Shared React components (Navbar, Toast, etc.)
+ │   ├─ hooks/       # Custom React hooks
+ │   ├─ lib/         # Config, Logger, Settings, Validation
+ │   ├─ pages/       # Application pages (LoginPage, etc.)
+ │   ├─ styles/      # Tailwind / global styles
+ │   └─ main.tsx     # Application entry
+ ├─ public/          # Static assets (icons, images, etc.)
+ ├─ index.html       # Root HTML
+ ├─ package.json
+ ├─ tsconfig.json
+ └─ vite.config.ts
+```
+
+---
+
+## 🌐 Environment Variables
+Environment variables are defined in `.env` files:
+
+- `.env` – default
+- `.env.development` – for dev
+- `.env.production` – for prod
+
+Example (`.env.example`):
+```env
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+---
+
+## ⚡ Features
+- 🔑 Authentication (login form with validation)
+- 🌗 Theme switch (light/dark)
+- 🔔 Global Toast notifications
+- 📦 API client wrapper
+- 🛠 Config & Logger utilities
+
+---
+
+## 📝 Notes
+- All environment variables **must** be prefixed with `VITE_` to be accessible in the frontend.
+- Keep UI code clean and modular.
+- See `lib/` for utilities and shared classes.

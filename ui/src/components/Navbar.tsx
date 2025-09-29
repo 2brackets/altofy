@@ -1,18 +1,23 @@
 import { useState, type JSX } from "react";
 import { PiDevicesBold, PiUsersBold, PiAppWindowBold, PiUserBold } from "react-icons/pi";
-import { TbSettings, TbLogout } from "react-icons/tb";
+import { TbSettings, TbLogout, TbHome } from "react-icons/tb";
 import { RiSignalTowerFill } from "react-icons/ri";
 
 type NavItem = {
-  label: "Clients" | "Users" | "Apps" | "Settings";
+  label: "Home" | "Clients" | "Users" | "Apps" | "Settings";
   icon: JSX.Element;
 };
 
-export default function Navbar() {
+type NavbarProps = {
+  isAuthed: boolean;          
+  initials?: string;          
+}
 
-  const initials: string = "HS";
-  const [active, setActive] = useState<"Clients" | "Users" | "Apps" | "Settings">("Clients");
+export default function Navbar({ isAuthed, initials }: NavbarProps) {
+
+  const [active, setActive] = useState<"Home" | "Clients" | "Users" | "Apps" | "Settings">("Home");
   const items: NavItem[] = [
+    { label: "Home", icon: <TbHome className="text-lg" /> },
     { label: "Clients", icon: <PiDevicesBold className="text-lg" /> },
     { label: "Users", icon: <PiUsersBold className="text-lg" /> },
     { label: "Apps", icon: <PiAppWindowBold className="text-lg" /> },
@@ -20,38 +25,41 @@ export default function Navbar() {
   ];
 
     return (
-        <div className="navbar bg-base-100 shadow-sm fixed top-0 left-0 w-full z-50">
-            <div className="flex-1">
-              <a className="btn btn-ghost text-xl"><RiSignalTowerFill/> Altofy</a>
+        <div className="navbar h-16 py-0 bg-base-100 shadow-sm fixed top-0 left-0 w-full z-50">
+            <div className="flex-1 h-full">
+              <a className="btn btn-ghost text-xl h-full cursor-pointer"><RiSignalTowerFill/> Altofy</a>
             </div>
-            <div className="flex-none h-full pr-16">
-              <ul className="flex h-full">
-                {items.map(({ label, icon }) => {
+            {isAuthed && (
+              <div className="flex-none pr-16 h-full">
+                <ul className="flex items-stretch h-full">
+                  {items.map(({ label, icon }) => {
                   const isActive = active === label;
                   return (
-                    <li key={label} className="h-full flex items-center">
-                      <button
-                        onClick={() => setActive(label)}
-                        className={[
-                          "h-full px-6 inline-flex items-center justify-center gap-2 font-semibold text-lg",
-                          "border-b-4", 
-                          isActive
-                            ? "border-accent text-accent"
-                            : "border-transparent text-base-content/80 hover:border-accent hover:text-accent",
-                          "transition-colors"
-                        ].join(" ")}
-                      >
-                        {icon}
-                        {label}
-                      </button>
-                    </li>
+                    <li
+                      key={label}
+                      className={[
+                        "h-full flex items-center border-b-4 transition-colors",
+                        isActive
+                        ? "border-accent text-accent"
+                        : "border-transparent text-base-content/80 hover:border-accent hover:text-accent"
+                      ].join(" ")}
+                    >
+                    <button
+                      onClick={() => setActive(label)}
+                      className="h-full px-6 flex items-center gap-2 font-semibold text-lg cursor-pointer"
+                    >
+                      {icon}
+                      {label}
+                    </button>
+                  </li>
                   );
-                })}
-              </ul>
-            </div>
-            <div className="flex-none flex items-center gap-2">
+                  })}
+                </ul>
+              </div>
+            )}
+            <div className="flex-none flex items-center gap-2 pr-6">
               <label className="swap swap-rotate">
-                <input type="checkbox" className="theme-controller" value="winter" />
+                <input type="checkbox" className="theme-controller cursor-pointer" value="winter" />
                 <svg
                   className="swap-off h-8 w-8 fill-current"
                   xmlns="http://www.w3.org/2000/svg"
@@ -67,21 +75,23 @@ export default function Navbar() {
                     d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
                 </svg>
               </label>
-              <div className="dropdown dropdown-end">
-                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                  <div className="avatar avatar-placeholder">
-                    <div className="bg-neutral text-neutral-content w-8 rounded-full">
-                      <span>{initials}</span>
+              {isAuthed && (
+                <div className="dropdown dropdown-end">
+                  <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar cursor-pointer">
+                    <div className="avatar avatar-placeholder">
+                      <div className="bg-neutral text-neutral-content w-8 rounded-full">
+                        <span>{initials}</span>
+                      </div>
                     </div>
                   </div>
+                  <ul
+                    tabIndex={0}
+                    className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow cursor-pointer">
+                    <li><a><PiUserBold/> Profile</a></li>
+                    <li><a><TbLogout/> Logout</a></li>
+                  </ul>
                 </div>
-                <ul
-                  tabIndex={0}
-                  className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                  <li><a><PiUserBold/> Profile</a></li>
-                  <li><a><TbLogout/> Logout</a></li>
-                </ul>
-              </div>
+              )}
             </div>
         </div>
     )

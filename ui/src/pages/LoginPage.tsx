@@ -1,22 +1,52 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiSignalTowerFill } from "react-icons/ri";
 import { isValidEmail, isValidPassword } from "../utils/validation";
 import { useToast } from "../components/toast/ToastContext";
+import { Api } from "../lib/api";
+import { Logger } from "../lib/logger"
 
 export default function LoginPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [serverStatus, setServerStatus] = useState(false);
+    const [dbStatus, setDbStatus] = useState(false);
     const { push } = useToast();
+
+    useEffect(() => {
+      (async () => {
+        try {
+          const ok = await Api.get<boolean>("/api/health");
+          if (!ok) {
+            setServerStatus(false);
+            setDbStatus(false)
+            push({ type: "error", text: "Backend unreachable" });
+         }
+      } catch (err) {
+        setServerStatus(false);
+        setDbStatus(false)
+        Logger.error("Health check failed", err);
+        push({ type: "error", text: "Backend unreachable" });
+      }
+    })();
+  }, [push]);
+
 
     function handleLogin(e: React.FormEvent) {
       e.preventDefault();
       setIsLoading(true);
+
+      if(!serverStatus && !dbStatus){
+        setIsLoading(false);
+        setPassword("");
+        push({ type: "error", text: "Backend unreachable" });
+        return;
+      }
       
       if(!isValidEmail(email)){
         setIsLoading(false);
-        setPassword("")
+        setPassword("");
         push({ type: "warning", text: "Invalid email address" });
         return;
       }
@@ -69,6 +99,33 @@ export default function LoginPage() {
             </button>
           </fieldset>
         </form>
+        <div className="w-xs mt-4 flex justify-center gap-6">
+          <div className="flex items-center gap-2">
+            <span
+              className={`w-3 h-3 rounded-full ${
+                serverStatus === true
+                  ? "bg-success"
+                  : serverStatus === false
+                  ? "bg-error"
+                  : "bg-gray-400"
+              }`}
+            />
+            <span className="text-sm text-base-content">Server</span>
+          </div>
+              
+          <div className="flex items-center gap-2">
+            <span
+              className={`w-3 h-3 rounded-full ${
+                dbStatus === true
+                  ? "bg-success"
+                  : dbStatus === false
+                  ? "bg-error"
+                  : "bg-gray-400"
+              }`}
+            />
+            <span className="text-sm text-base-content">Database</span>
+          </div>
+        </div>
       </div>
     )
 }

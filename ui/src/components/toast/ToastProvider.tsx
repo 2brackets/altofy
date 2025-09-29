@@ -1,9 +1,8 @@
 import { useCallback, useRef, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { ToastProviderRoot } from "./ToastContext";
+import { ToastContext, type ToastContextValue } from "./ToastContext";
 import type { Toast, ToastType } from "./ToastTypes";
 
-// Ikoner (SVG) – samma som tidigare men kompakta
 const Icon = {
   info: (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -61,25 +60,24 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
   const push = useCallback((t: { type: ToastType; text: string; duration?: number }) => {
     const id = genId();
     const toast: Toast = { id, ...t };
-    setToasts((prev) => [toast, ...prev].slice(0, 5)); // max 5 i stacken (ändra om du vill)
-
-    const dur = t.duration ?? 3000;
+    setToasts((prev) => [toast, ...prev].slice(0, 5)); 
+    const dur = t.duration ?? 6000;
     timers.current[id] = window.setTimeout(() => remove(id), dur);
   }, [remove]);
 
-  // Rensa timers vid unmount
   useEffect(() => {
     return () => {
-      Object.values(timers.current).forEach((t) => window.clearTimeout(t));
+      Object.values(timers.current).forEach((tid) => window.clearTimeout(tid));
       timers.current = {};
     };
   }, []);
 
+  const value: ToastContextValue = { push, remove };
+
   return (
-    <ToastProviderRoot value={{ push, remove }}>
+    <ToastContext.Provider value={value}>
       {children}
 
-      {/* Global fixed toast-container: top-right, under navbar (mt-16), hög z-index */}
       <div className="toast toast-top toast-end mt-16 z-50 fixed right-4 top-0">
         {toasts.map((t) => (
           <div key={t.id} className={`alert ${styleByType[t.type]} shadow-lg animate-fadeIn`}>
@@ -95,6 +93,6 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
           </div>
         ))}
       </div>
-    </ToastProviderRoot>
+    </ToastContext.Provider>
   );
 }
