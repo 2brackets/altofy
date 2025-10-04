@@ -14,20 +14,32 @@ export default function LoginPage() {
     const [dbStatus, setDbStatus] = useState(false);
     const { push } = useToast();
 
+    type HealthStatus = {
+      server: boolean;
+      database: boolean;
+    };
+
     useEffect(() => {
       (async () => {
         try {
-          const ok = await Api.get<boolean>("/api/health");
-          if (!ok) {
+          const resp = await Api.get<HealthStatus>("/api/health");
+          if(resp.statusCode == 200){
+            setServerStatus(resp.data.server);
+            setDbStatus(resp.data.database);
+            if(!resp.data.database){
+              push({ type: "error", text: "Database unreachable" });
+            }
+          }
+          else{
             setServerStatus(false);
-            setDbStatus(false)
-            push({ type: "error", text: "Backend unreachable" });
-         }
+            setDbStatus(false);
+            push({ type: "warning", text: "Could not contact server status code: " + resp.statusCode });
+          }
       } catch (err) {
         setServerStatus(false);
         setDbStatus(false)
         Logger.error("Health check failed", err);
-        push({ type: "error", text: "Backend unreachable" });
+        push({ type: "error", text: "Backend and Database unreachable" });
       }
     })();
   }, [push]);
@@ -40,7 +52,7 @@ export default function LoginPage() {
       if(!serverStatus && !dbStatus){
         setIsLoading(false);
         setPassword("");
-        push({ type: "error", text: "Backend unreachable" });
+        push({ type: "error", text: "Backend or Database unreachable" });
         return;
       }
       

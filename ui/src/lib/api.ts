@@ -1,4 +1,5 @@
 import { config } from "../config";
+import type { ApiResponse } from "../models/apiResponse";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -9,7 +10,7 @@ export class Api {
     path: string,
     method: HttpMethod,
     body?: unknown
-  ): Promise<T> {
+  ): Promise<ApiResponse<T>> {
     const res = await fetch(`${this.baseUrl}${path}`, {
       method,
       headers: { "Content-Type": "application/json" },
@@ -20,22 +21,22 @@ export class Api {
       throw new Error(`API error: ${res.status} ${res.statusText}`);
     }
 
-    return res.json() as Promise<T>;
+    return res.json() as Promise<ApiResponse<T>>;
   }
 
-  static get<T>(path: string): Promise<T> {
+  static get<T>(path: string): Promise<ApiResponse<T>> {
     return this.request<T>(path, "GET");
   }
 
-  static post<T>(path: string, body: unknown): Promise<T> {
+  static post<T>(path: string, body: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(path, "POST", body);
   }
 
-  static put<T>(path: string, body: unknown): Promise<T> {
+  static put<T>(path: string, body: unknown): Promise<ApiResponse<T>> {
     return this.request<T>(path, "PUT", body);
   }
 
-  static delete<T>(path: string): Promise<T> {
+  static delete<T>(path: string): Promise<ApiResponse<T>> {
     return this.request<T>(path, "DELETE");
   }
 }
