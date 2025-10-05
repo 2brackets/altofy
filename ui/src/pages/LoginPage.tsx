@@ -4,6 +4,9 @@ import { isValidEmail, isValidPassword } from "../utils/validation";
 import { useToast } from "../components/toast/ToastContext";
 import { Api } from "../lib/api";
 import { Logger } from "../lib/logger"
+import type { LoginRequest, LoginResponse } from "../models/auth";
+import { Session } from "../lib/session";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
 
@@ -13,6 +16,7 @@ export default function LoginPage() {
     const [serverStatus, setServerStatus] = useState(false);
     const [dbStatus, setDbStatus] = useState(false);
     const { push } = useToast();
+    const navigate = useNavigate();
 
     type HealthStatus = {
       server: boolean;
@@ -45,34 +49,44 @@ export default function LoginPage() {
   }, [push]);
 
 
-    function handleLogin(e: React.FormEvent) {
+    async function handleLogin(e: React.FormEvent) {
       e.preventDefault();
-      setIsLoading(true);
 
-      if(!serverStatus && !dbStatus){
-        setIsLoading(false);
+      try {
+        if (!serverStatus || !dbStatus) {
+          setPassword("");
+          push({ type: "error", text: "Backend eller databas är inte nåbar" });
+          return;
+        }
+
+        if (!isValidEmail(email)) {
+          setPassword("");
+          push({ type: "warning", text: "Ogiltig e-postadress" });
+          return;
+        }
+      
+        if (!isValidPassword(password)) {
+          push({ type: "warning", text: "Lösenord får inte vara tomt" });
+          return;
+        }
+        setIsLoading(true);
+        const payload: LoginRequest = { email, password };
+        const resp = await Api.post<LoginResponse>("/api/auth/login", payload);
+      
+        Session.set(resp.data);
+      
         setPassword("");
-        push({ type: "error", text: "Backend or Database unreachable" });
-        return;
+        push({ type: "success", text: `Välkommen ${resp.data.user.firstName}!` });
+        navigate("/", { replace: true });
+
+      } catch (err) {
+        Logger.error("Login failed", err);
+        setPassword("");
+        push({ type: "error", text: err instanceof Error ? err.message : "Login misslyckades" });
+      } finally {
+        setIsLoading(false);
       }
       
-      if(!isValidEmail(email)){
-        setIsLoading(false);
-        setPassword("");
-        push({ type: "warning", text: "Invalid email address" });
-        return;
-      }
-
-      if(!isValidPassword(password)){
-        setIsLoading(false);
-        push({ type: "warning", text: "Password cannot be empty." });
-        return;
-      }
-
-      setTimeout(() => {
-        setIsLoading(false);
-        push({ type: "success", text: "Login successful" });
-      }, 2000);
     } 
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">

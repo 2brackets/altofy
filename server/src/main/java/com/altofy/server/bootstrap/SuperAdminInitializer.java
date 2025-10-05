@@ -18,21 +18,27 @@ import java.util.UUID;
 public class SuperAdminInitializer implements ApplicationRunner {
     private static final Logger log = LoggerFactory.getLogger(SuperAdminInitializer.class);
 
-    private final UserRepository users;
-    private final PasswordEncoder encoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public SuperAdminInitializer(UserRepository users, PasswordEncoder encoder) {
-        this.users = users;
-        this.encoder = encoder;
+    public SuperAdminInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @Value("${app.superadmin.enabled:false}")
+    @Value("${app.superadmin.enabled}")
     private boolean enabled;
 
-    @Value("${app.superadmin.email:}")
+    @Value("${app.superadmin.firstname}")
+    private String firstName;
+
+    @Value("${app.superadmin.lastname}")
+    private String lastName;
+
+    @Value("${app.superadmin.email}")
     private String email;
 
-    @Value("${app.superadmin.password:}")
+    @Value("${app.superadmin.password}")
     private String password;
 
     @Override
@@ -46,25 +52,25 @@ public class SuperAdminInitializer implements ApplicationRunner {
             return;
         }
 
-        // Finns redan någon SUPER_ADMIN? -> klart
-        if (users.existsByRole(Role.SUPER_ADMIN)) {
+        if (userRepository.existsByRole(Role.SUPER_ADMIN)) {
             log.info("SUPER_ADMIN already exists. Skipping creation.");
             return;
         }
 
-        // Skapa bara om just den e-posten inte redan finns
         final String normalizedEmail = email.trim().toLowerCase();
-        if (users.existsByEmail(normalizedEmail)) {
+        if (userRepository.existsByEmail(normalizedEmail)) {
             log.warn("User with superadmin email already exists. Skipping creation.");
             return;
         }
 
         User u = new User(null,  normalizedEmail);
-        u.setPassword(encoder.encode(password));   // bcrypt (hash + salt)
+        u.setFirstName(firstName);
+        u.setLastName(lastName);
+        u.setPassword(passwordEncoder.encode(password));
         u.setRole(Role.SUPER_ADMIN);
-        u.setCreated(OffsetDateTime.now());        // backend sätter created
+        u.setCreated(OffsetDateTime.now());
 
-        users.save(u);
+        userRepository.save(u);
         log.info("SUPER_ADMIN created with email {}", normalizedEmail);
     }
 }
