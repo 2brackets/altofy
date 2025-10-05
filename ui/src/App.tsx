@@ -1,15 +1,26 @@
+// src/App.tsx
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import LoginPage from "./pages/LoginPage";
-import './App.css'
+import RequireAuth from "./components/auth/RequireAuth";
+import HomePage from "./pages/HomePage";
+import "./App.css";
 
-function App() {
- //const [isAuthed, setIsAuthed] = useState(false);
+export default function App() {
   return (
-    <>
-      <Navbar isAuthed={false} initials=""/>
-      <LoginPage/>
-    </>
-  )
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/"
+          element={
+            <RequireAuth>
+              <HomePage />
+            </RequireAuth>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
-export default App

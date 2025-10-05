@@ -1,4 +1,6 @@
 import { useState, type JSX } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Session } from "../lib/session";
 import { PiDevicesBold, PiUsersBold, PiAppWindowBold, PiUserBold } from "react-icons/pi";
 import { TbSettings, TbLogout, TbHome } from "react-icons/tb";
 import { RiSignalTowerFill } from "react-icons/ri";
@@ -8,12 +10,13 @@ type NavItem = {
   icon: JSX.Element;
 };
 
-type NavbarProps = {
-  isAuthed: boolean;          
-  initials?: string;          
-}
+export default function Navbar() {
+  useLocation();
+  const navigate = useNavigate();
 
-export default function Navbar({ isAuthed, initials }: NavbarProps) {
+  const user = Session.getUser();
+  const isAuthed = Session.isAuthenticated();
+  const initials = user ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}` : "";
 
   const [active, setActive] = useState<"Home" | "Clients" | "Users" | "Apps" | "Settings">("Home");
   const items: NavItem[] = [
@@ -23,6 +26,11 @@ export default function Navbar({ isAuthed, initials }: NavbarProps) {
     { label: "Apps", icon: <PiAppWindowBold className="text-lg" /> },
     { label: "Settings", icon: <TbSettings className="text-lg" /> },
   ];
+
+  function handleLogout() {
+    Session.clear();
+    navigate("/login", { replace: true });
+  }
 
     return (
         <div className="navbar h-16 py-0 bg-base-100 shadow-sm fixed top-0 left-0 w-full z-50">
@@ -88,7 +96,7 @@ export default function Navbar({ isAuthed, initials }: NavbarProps) {
                     tabIndex={0}
                     className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow cursor-pointer">
                     <li><a><PiUserBold/> Profile</a></li>
-                    <li><a><TbLogout/> Logout</a></li>
+                    <li><a onClick={handleLogout}><TbLogout/> Logout</a></li>
                   </ul>
                 </div>
               )}

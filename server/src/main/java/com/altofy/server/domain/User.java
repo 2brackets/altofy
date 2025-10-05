@@ -16,6 +16,10 @@ import java.util.UUID;
 public class User {
     @Id
     private UUID id;
+    @Column("first_name")
+    private String firstName;
+    @Column("last_name")
+    private String lastName;
     private String email;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
